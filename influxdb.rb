@@ -40,6 +40,8 @@ Date: Sun, 19 Jul 2015 18:50:21 GMT
 
 =end
 
+OUTLIMIT = 10 # Limit the read output
+
 module DatalayerLight
 
   class InfluxDB
@@ -75,9 +77,9 @@ module DatalayerLight
     
     def apipost(data)
       @dburl = "http://#{@dbhost}:#{@dbport}"
-      puts "InfluxDB SQL URL: #{@dburl}/query?db=#{@dbname}"
+      #puts "InfluxDB SQL URL: #{@dburl}/query?db=#{@dbname}"
       uri = URI.parse("#{@dburl}/write?db=#{@dbname}")
-      puts "Request URI: #{uri}"
+      #puts "Request URI: #{uri}"
       http = Net::HTTP.new(uri.host, uri.port)
       request = Net::HTTP::Post.new(uri.request_uri)
       request.set_content_type("application/x-www-form-urlencoded")
@@ -108,23 +110,49 @@ end
 
 metrics = DatalayerLight::InfluxDB.new
 metrics.dbhost = "172.17.0.2"
+begin
+  # Write measurements to InfluxDB
+  a = ["server1", "server2", "server3"]
+  b = ["us-north", "us-south", "us-east", "us-west"]
+  c = [0.50, 0.60, 0.80, 0.90]
+  recordcount = 0
+  50.times {|n|
+    host = a[rand(a.size)]
+    region = b[rand(b.size)]
+    value = c[rand(c.size)]
+    j = metrics.query("cpu,host=#{host},region=#{region} value=#{value}", 'w')
+    recordcount = recordcount + 1
+  }
+  puts "#{recordcount} record where written to InfluxDB!"
+rescue
+  puts "Something went wrong exiting..."
+end
 
-=begin
-
-# Read measurements from InfluxDB
-j = metrics.query("SELECT * FROM cpu", 'r')
-puts j
-puts j.class
-
-=end
-
-# Write measurements to InfluxDB
-a = ["server1", "server2", "server3"]
-b = ["us-north", "us-south", "us-east", "us-west"]
-c = [0.50, 0.60, 0.80, 0.90]
-1000.times {|n|
-  host = a[rand(a.size)]
-  region = b[rand(b.size)]
-  value = c[rand(c.size)]
-  j = metrics.query("cpu,host=#{host},region=#{region} value=#{value}", 'w')
-}
+begin
+  # Read measurements from InfluxDB
+  j = metrics.query("SELECT * FROM cpu WHERE region = 'us-east' LIMIT #{OUTLIMIT}", 'r')
+  j["results"].each {|n|
+    n["series"].each {|a|
+      name = a["name"]
+      tags = a["tags"]
+      host = tags["host"]
+      region = tags["region"]
+      puts "Tags | Host: #{host} Region: #{region}"
+      columns = a["columns"]
+      values = a["values"]
+      d = 0
+      puts "Dataset"
+      columns.each {|c|
+        values.each {|v|
+          print "#{columns[d]}: #{v[d]} "
+          d = d + 1
+          if d == 2; d = 0; print "\n"; end
+        }
+      }
+      puts "Name: #{name} Columns: #{columns}\n\n"
+    }
+  }
+  puts "Data output complete ! i am limited to #{OUTLIMIT} records in the code"
+rescue
+  puts "Unable to read data"
+end
