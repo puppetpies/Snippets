@@ -12,6 +12,63 @@ require "net/http"
 require "uri"
 require "json"
 require "pp"
+require "guid"
+
+module NumTools
+
+  def random_between(min, max); min+rand(max); end
+
+  def self.define_component(name)
+    name_func = name.to_s.gsub("_to", "").to_sym
+    define_method(name) do |val, x|  
+      (val * 10**x).send("#{name_func}").to_f / 10**x
+    end
+  end
+
+  define_component :floor_to
+  define_component :ceil_to
+  define_component :round_to
+
+end
+
+class Stopwatch
+
+  include NumTools
+
+  attr_reader :t1, :t2, :roundvals
+
+  private
+
+  def initialize
+    @roundvals = []
+  end
+  
+  def intervalh
+    round = round_to(@t2 - @t1, 2)
+    t1h, t2h, @calc = Time.at(@t1), Time.at(@t2), round
+    record(round)
+  end
+
+  protected
+
+  def timestamp; Time.now.to_f; end
+
+  public
+
+  def record(round)
+    @roundvals << round
+  end
+  
+  def watch(method)
+    if method == "start"
+      @t1 = timestamp
+    elsif method == "stop"
+      @t2 = timestamp
+      intervalh
+    end
+  end
+
+end
 
 =begin
 
@@ -108,29 +165,40 @@ module DatalayerLight
 
 end
 
+@stw = Stopwatch.new
 metrics = DatalayerLight::InfluxDB.new
 metrics.dbhost = "172.17.0.2"
 begin
   # Write measurements to InfluxDB
+  
   a = ["server1", "server2", "server3"]
   b = ["us-north", "us-south", "us-east", "us-west"]
-  c = [0.50, 0.60, 0.80, 0.90]
+  guid = Guid.new # Per benchmark
   recordcount = 0
-  50.times {|n|
-    host = a[rand(a.size)]
-    region = b[rand(b.size)]
-    value = c[rand(c.size)]
-    j = metrics.query("cpu,host=#{host},region=#{region} value=#{value}", 'w')
-    recordcount = recordcount + 1
+  5.times {|m|
+    @stw.watch('start')
+    1000.times {|n|
+      host = a[rand(a.size)]
+      region = b[rand(b.size)]
+      value = rand(0.99)
+      j = metrics.query("cpu,guid=#{guid},host=#{host},region=#{region} value=#{value}", 'w')
+      recordcount = recordcount + 1
+    }
+    puts "#{recordcount} record where written to InfluxDB!"
+    ontheclock = @stw.watch('stop')
+    puts "Wall Time(s) seconds: #{ontheclock}"    
   }
-  puts "#{recordcount} record where written to InfluxDB!"
 rescue
   puts "Something went wrong exiting..."
 end
 
 begin
   # Read measurements from InfluxDB
-  j = metrics.query("SELECT * FROM cpu WHERE region = 'us-east' LIMIT #{OUTLIMIT}", 'r')
+  #  WHERE region = 'us-east' LIMIT #{OUTLIMIT}
+  @str = Stopwatch.new
+  @str.watch('start')
+  j = metrics.query("SELECT * FROM cpu", 'r')
+  ontheclock = @str.watch('stop')
   j["results"].each {|n|
     n["series"].each {|a|
       name = a["name"]
@@ -156,3 +224,17 @@ begin
 rescue
   puts "Unable to read data"
 end
+
+at_exit {
+  include NumTools
+  mybench = @stw.roundvals
+  min = mybench.min
+  avg = mybench.inject{ |sum, el| sum + el }.to_f / mybench.size
+  avground = round_to(avg, 2)
+  max = mybench.max
+  arrsize = mybench.size
+
+  mybench2 = @str.roundvals
+  puts "Select Query: #{mybench2}"
+  puts "Insert Performance - Min: #{min} Avg: #{avground} Max: #{max} Arr Size: #{arrsize}"
+}
