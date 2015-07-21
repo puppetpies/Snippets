@@ -225,7 +225,7 @@ end
 # Select query Stopwatch
 @stw = Stopwatch.new
 metrics = DatalayerLight::InfluxDB.new
-metrics.dbhost = "172.17.0.2"
+metrics.dbhost = "172.17.0.1"
 begin
   # Write measurements to InfluxDB
   a = ["server1", "server2", "server3"]
