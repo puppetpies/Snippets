@@ -51,6 +51,8 @@ ARGV[0] = "--help" if ARGV[0] == nil
 
 opts = GetoptLong.new(
   [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
+  [ '--host', '-n', GetoptLong::REQUIRED_ARGUMENT],
+  [ '--port', '-p', GetoptLong::OPTIONAL_ARGUMENT],
   [ '--iterations', '-i', GetoptLong::REQUIRED_ARGUMENT],
   [ '--chunksize', '-c', GetoptLong::REQUIRED_ARGUMENT],
   [ '--ommit', '-o', GetoptLong::OPTIONAL_ARGUMENT ]
@@ -64,6 +66,10 @@ opts.each do |opt, arg|
       helper << %q[
 -h, --help:
    show help
+   
+-n --host name / ip
+
+-p --port Defaults to 8086
 
 -i --iterations
     Iterations of to run
@@ -80,13 +86,20 @@ Example:
       
       This will run 3x 250 record chunks with a total of 750 records being inserted into the database.
       
-      Also using ommit will stop a flood of on screen data at the end of the write.]
+      Also using ommit will stop a flood of on screen data at the end of the write.
+      
+      If your getting Error posting data then your database isn't running or need to set the correct IP.
+      ]
       puts helper
       exit
     when '--iterations'
       @iterations = arg.to_i
     when '--chunksize'
       @chunksize = arg.to_i
+    when '--host'
+      @host = arg
+    when '--port'
+      @port = arg.to_i
     when '--ommit'
       @ommit = 1
   end
@@ -225,7 +238,14 @@ end
 # Select query Stopwatch
 @stw = Stopwatch.new
 metrics = DatalayerLight::InfluxDB.new
-metrics.dbhost = "172.17.0.1"
+if defined?(@host)
+  metrics.dbhost = "#{@host}"
+  puts "Using InfluxDB Host: #{@host}"
+end
+if defined?(@port)
+  metrics.dbport = @port
+  puts "Using TCP Port: #{@port}"
+end
 begin
   # Write measurements to InfluxDB
   a = ["server1", "server2", "server3"]
