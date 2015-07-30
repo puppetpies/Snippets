@@ -1,0 +1,4 @@
+CREATE DATABASE threatmonitor;
+CREATE USER threatmonitor WITH PASSWORD 'mypasswd';
+CREATE USER admin WITH PASSWORD 'myclusterpasswd' WITH ALL PRIVILEGES;
+USE threatmonitor;
