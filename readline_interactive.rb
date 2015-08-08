@@ -58,11 +58,17 @@ class MyMenu
     end
   end
   
-  def funcdefine(func, &codeeval)
+  def funcdefine(func, &codeeval, args=nil)
     func_name = func.to_sym
-    Kernel.send :define_method, func_name do
-      codeeval.call
-    end  
+    if args == nil
+      Kernel.send :define_method, func_name do
+        codeeval.call
+      end
+    else
+      Kernel.send :define_method, func_name do |args|
+        codeeval.call
+      end    
+    end
   end
   
   def menubuilder(codestore)
@@ -91,6 +97,9 @@ x.mymenuname = "Trafviz"
 x.prompt = "Trafviz"
 x.additem(1, "List Filters")
 x.additem(2, "Set Filters")
+x.funcdefine("createmenu") do |buf|
+  eval(merge)
+end
 x.funcdefine("testfunc") do
   puts "testing"
 end
