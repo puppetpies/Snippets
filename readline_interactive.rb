@@ -1,30 +1,27 @@
 ########################################################################
 #
-# filtermanager.rb
+# MyMenu Readline interactive menu builder
 #  
 # Author: Brian Hood 
-# Description:
+# Description: Build interactive menu's with Readline quickly
 # 
 ########################################################################
  
 require 'readline'
-require 'pcaplet'
-require 'getoptlong'
 
 class MyMenu
 
-  attr_writer :mymenuname, :mymenugreeting, :prompt, :promptcolor, :menutitlecolour
+  attr_writer :mymenuname, :mymenugreeting, :prompt, :promptcolor, :menutitlecolour, :mymenushow
   attr_reader :menuitems
   
   def initialize
-    @filters = Array.new
-    @filter_inuse = String.new
     @mymenuname = "MyMenu"
     @prompt = "MyPrompt"
     @promptcolor = "\e[1;32m\ ".strip
     @menuitems = Array.new
     @menuitemnumbercolor = "\e[1;36m"
     @mymenugreeting = "Welcome to MyMenu"
+    @mymenutoggle = true
   end
 
   def settitle(title)
@@ -37,35 +34,82 @@ class MyMenu
 }
   end
   
-  def additem(number, name, func)
+  def additemtolist(number, name, func)
     @menuitems << [number, "#{name}", "#{func}"]
+  end
+  
+  def showmenu
+    unless @mymenutoggle == false
+      puts @menutitle
+      @menuitems.each {|n|
+        puts "#{@menuitemnumbercolor}#{n[0]})\e[0m\ #{n[1]}"        
+      }
+      puts "\n"
+    end
+  end
+  
+  def togglemenu
+    if @mymenutoggle == true
+      @mymenutoggle = false
+      puts "Toggle Menu: #{@mymenutoggle}"
+    else
+      @mymenutoggle = true
+      puts "Toggle Menu: #{@mymenutoggle}"
+    end
   end
   
   def menu!
     menubuilder
     createmenu("0")
+    showmenu
     while buf = Readline.readline("#{@promptcolor}#{@prompt}>\e[0m\ ", true)
+      trap("INT") {
+        puts "\nGoodbye see yall later!!!"
+        exit
+      }
       begin
-        puts @menutitle
-        @menuitems.each {|n|
-          puts "#{@menuitemnumbercolor}#{n[0]})\e[0m\ #{n[1]}"        
-        }
-        puts "\n"
+        showmenu
         createmenu(buf)
       rescue NoMethodError
       end
     end
   end
   
-  def funcdefine(func, args=nil, &codeeval)
+  def evalreadline(&block)
+    while buf2 = Readline.readline("#{@promptcolor}#{@prompt}>\e[0m\ ", true)
+      puts "Here5"
+      block.call
+      puts "Here6"
+    end
+  end
+  
+  def evalreadline?(readlineprompt, &codeeval)
+    if readlineprompt == false
+      puts "Here3"
+      codeeval.call
+    else
+      puts "Here4"
+      evalreadline do
+        codeeval
+      end
+    end
+  end
+  
+  def definemenuitem(func, readlineprompt=false, args=nil, &codeeval)
     func_name = func.to_sym
     if args == nil
       Kernel.send :define_method, func_name do
-        codeeval.call
+        evalreadline?(readlineprompt) do
+          puts "Here"
+          codeeval.call
+        end
       end
     else
       Kernel.send :define_method, func_name do |args|
-        codeeval.call
+        evalreadline?(readlineprompt) do
+          puts "Here2"
+          codeeval.call
+        end
       end    
     end
   end
@@ -84,7 +128,7 @@ class MyMenu
     }
     tail = "end"
     merge = "#{head}#{mc}#{tail}"
-    #puts "Merge: #{merge}"
+    puts "Dynamic Merge: #{merge}".gsub(";", "\n")
     Kernel.send :define_method, :createmenu do |buf|
       eval(merge)
     end
@@ -97,13 +141,23 @@ x.settitle("Welcome to Trafviz")
 x.mymenuname = "Trafviz"
 x.prompt = "Trafviz"
 # Add my methods
-x.funcdefine("listfilters") do
+x.definemenuitem("listfilters") do
   puts "My List filters block"
 end
-x.funcdefine("setfilters") do
-  puts "My Set filters block"
+x.definemenuitem("setfilters") do
+  #puts "My Set filters block"
+  y = MyMenu.new
+  y.prompt = "Trafiz {Filters}>"
+  y.definemenuitem("setfilter", true) do
+    puts "Hello"
+    break
+  end
+  y.setfilter
 end
-x.additem(1, "List Filters", "listfilters;")
-x.additem(2, "Set Filters", "setfilters;")
-x.additem(3, "Exit Trafviz", "exit;")
+# Define your list items
+x.additemtolist(1, "List Filters", "listfilters;")
+x.additemtolist(2, "Set Filters", "setfilters;")
+x.additemtolist(3, "Display Menu", "showmenu;")
+x.additemtolist(4, "Toggle Menu", "togglemenu;")
+x.additemtolist(5, "Exit Trafviz", "exit;")
 x.menu!
