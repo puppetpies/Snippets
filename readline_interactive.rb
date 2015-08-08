@@ -92,7 +92,7 @@ x.prompt = "Trafviz"
 x.additem(1, "List Filters")
 x.additem(2, "Set Filters")
 x.funcdefine("testfunc") do
-  puts "hello"
+  puts "testing"
 end
 codestore = Array.new
 codestore[1] = "puts \"hello\"; "
