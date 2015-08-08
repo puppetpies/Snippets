@@ -37,11 +37,13 @@ class MyMenu
 }
   end
   
-  def additem(number, name)
-    @menuitems << [number, "#{name}"]
+  def additem(number, name, func)
+    @menuitems << [number, "#{name}", "#{func}"]
   end
   
   def menu!
+    menubuilder
+    createmenu("0")
     while buf = Readline.readline("#{@promptcolor}#{@prompt}>\e[0m\ ", true)
       begin
         puts @menutitle
@@ -49,16 +51,13 @@ class MyMenu
           puts "#{@menuitemnumbercolor}#{n[0]})\e[0m\ #{n[1]}"        
         }
         puts "\n"
-        puts "m: This menu"
-        puts "q: Exit #{@mymenuname}\n"
-        puts "\n"
         createmenu(buf)
       rescue NoMethodError
       end
     end
   end
   
-  def funcdefine(func, &codeeval, args=nil)
+  def funcdefine(func, args=nil, &codeeval)
     func_name = func.to_sym
     if args == nil
       Kernel.send :define_method, func_name do
@@ -71,19 +70,21 @@ class MyMenu
     end
   end
   
-  def menubuilder(codestore)
+  def menubuilder
     head = "buf ||= String.new; case buf; "
     y = 1
     mc = String.new
     mc << "when \"0\"; "
     @menuitems.each {|n|
       mc << "when \"#{n[0]}\"; "
-      mc << codestore[y]
+      func_name = "#{n[2]}".gsub(";", "")
+      mc << " if !defined?(#{func_name}); puts \"\e[1;31m\Function not defined #{func_name}\e[0m\ \"; exit; end; "
+      mc << "#{n[2]}"
       y += 1
     }
     tail = "end"
     merge = "#{head}#{mc}#{tail}"
-    puts "Merge: #{merge}"
+    #puts "Merge: #{merge}"
     Kernel.send :define_method, :createmenu do |buf|
       eval(merge)
     end
@@ -95,17 +96,14 @@ x = MyMenu.new
 x.settitle("Welcome to Trafviz")
 x.mymenuname = "Trafviz"
 x.prompt = "Trafviz"
-x.additem(1, "List Filters")
-x.additem(2, "Set Filters")
-x.funcdefine("createmenu") do |buf|
-  eval(merge)
+# Add my methods
+x.funcdefine("listfilters") do
+  puts "My List filters block"
 end
-x.funcdefine("testfunc") do
-  puts "testing"
+x.funcdefine("setfilters") do
+  puts "My Set filters block"
 end
-codestore = Array.new
-codestore[1] = "puts \"hello\"; "
-codestore[2] = "testfunc; "
-x.menubuilder(codestore)
-x.createmenu("0")
+x.additem(1, "List Filters", "listfilters;")
+x.additem(2, "Set Filters", "setfilters;")
+x.additem(3, "Exit Trafviz", "exit;")
 x.menu!
