@@ -58,8 +58,29 @@ class MyMenu
     end
   end
   
-  def testfunc
-    puts "Test Func"
+  def funcdefine(func, codeeval)
+    func_name = func.to_sym
+    Kernel.send :define_method, func_name do
+      eval(codeeval)
+    end  
+  end
+  
+  def menubuilder(codestore)
+    head = "buf ||= String.new; case buf; "
+    y = 1
+    mc = String.new
+    mc << "when \"0\"; "
+    @menuitems.each {|n|
+      mc << "when \"#{n[0]}\"; "
+      mc << codestore[y]
+      y += 1
+    }
+    tail = "end"
+    merge = "#{head}#{mc}#{tail}"
+    puts "Merge: #{merge}"
+    Kernel.send :define_method, :createmenu do |buf|
+      eval(merge)
+    end
   end
   
 end
@@ -70,25 +91,10 @@ x.mymenuname = "Trafviz"
 x.prompt = "Trafviz"
 x.additem(1, "List Filters")
 x.additem(2, "Set Filters")
-head = "buf ||= String.new; case buf; "
-y = 0
 codestore = Array.new
-codestore[0] = "puts \"hello\"; "
-codestore[1] = "testfunc; "
-x.instance_eval do
-  mc = String.new
-  mc << "when \"0\"; "
-  @menuitems.each {|n|
-    mc << "when \"#{n[0]}\"; "
-    mc << codestore[y]
-    y += 1
-  }
-  tail = "end"
-  merge = "#{head}#{mc}#{tail}"
-  puts "Merge: #{merge}"
-  Kernel.send :define_method, :createmenu do |buf|
-    eval(merge)
-  end
-end
+codestore[1] = "puts \"hello\"; "
+codestore[2] = "testfunc; "
+x.funcdefine("testfunc", "puts \"hello code\";")
+x.menubuilder(codestore)
 x.createmenu("0")
 x.menu!
