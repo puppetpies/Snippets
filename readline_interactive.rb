@@ -14,6 +14,7 @@ require 'getoptlong'
 class MyMenu
 
   attr_writer :mymenuname, :mymenugreeting, :prompt, :promptcolor, :menutitlecolour
+  attr_reader :menuitems
   
   def initialize
     @filters = Array.new
@@ -51,17 +52,14 @@ class MyMenu
         puts "m: This menu"
         puts "q: Exit #{@mymenuname}\n"
         puts "\n"
-        case buf
-        when "1"
-        when "2"
-
-        when "m"
-        when "q"
-          exit
-        end
+        createmenu(buf)
       rescue NoMethodError
       end
     end
+  end
+  
+  def testfunc
+    puts "Test Func"
   end
   
 end
@@ -72,4 +70,25 @@ x.mymenuname = "Trafviz"
 x.prompt = "Trafviz"
 x.additem(1, "List Filters")
 x.additem(2, "Set Filters")
+head = "buf ||= String.new; case buf; "
+y = 0
+codestore = Array.new
+codestore[0] = "puts \"hello\"; "
+codestore[1] = "testfunc; "
+x.instance_eval do
+  mc = String.new
+  mc << "when \"0\"; "
+  @menuitems.each {|n|
+    mc << "when \"#{n[0]}\"; "
+    mc << codestore[y]
+    y += 1
+  }
+  tail = "end"
+  merge = "#{head}#{mc}#{tail}"
+  puts "Merge: #{merge}"
+  Kernel.send :define_method, :createmenu do |buf|
+    eval(merge)
+  end
+end
+x.createmenu("0")
 x.menu!
