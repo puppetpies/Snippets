@@ -24,6 +24,12 @@ class MyMenu
     @mymenutoggle = true
     @debug = 0
   end
+  
+  public
+
+  def additemtolist(number, name, func)
+    @menuitems << [number, "#{name}", "#{func}"]
+  end
 
   def settitle(title)
     @mymenugreeting = title
@@ -34,31 +40,7 @@ class MyMenu
 \e[1;38m\=========================/\e[0m\ \n
 }
   end
-  
-  def additemtolist(number, name, func)
-    @menuitems << [number, "#{name}", "#{func}"]
-  end
-  
-  def showmenu
-    unless @mymenutoggle == false
-      puts @menutitle
-      @menuitems.each {|n|
-        puts "#{@menuitemnumbercolor}#{n[0]})\e[0m\ #{n[1]}"        
-      }
-      puts "\n"
-    end
-  end
-  
-  def togglemenu
-    if @mymenutoggle == true
-      @mymenutoggle = false
-      puts "Toggle Menu: #{@mymenutoggle}" if @debug >= 1
-    else
-      @mymenutoggle = true
-      puts "Toggle Menu: #{@mymenutoggle}" if @debug >= 1
-    end
-  end
-  
+    
   def menu!
     menubuilder
     createmenu("0")
@@ -72,27 +54,6 @@ class MyMenu
         showmenu
         createmenu(buf)
       rescue NoMethodError
-      end
-    end
-  end
-  
-  def evalreadline(&block)
-    while buf2 = Readline.readline("#{@promptcolor}#{@prompt}>\e[0m\ ", true)
-      puts "Eval Readline Pre execution" if @debug >= 2
-      block.call
-      puts "Post execution of block in Readline prompt" if @debug >= 2
-      break
-    end
-  end
-  
-  def evalreadline?(readlineprompt, &codeeval)
-    if readlineprompt == false
-      puts "Without Readline" if @debug >= 2
-      codeeval.call
-    else
-      puts "Pre evalreadline with readlineprompt" if @debug >= 2
-      evalreadline do
-        codeeval.call
       end
     end
   end
@@ -116,6 +77,49 @@ class MyMenu
     end
   end
   
+  protected
+  
+  def evalreadline(&block)
+    while buf2 = Readline.readline("#{@promptcolor}#{@prompt}>\e[0m\ ", true)
+      puts "Eval Readline Pre execution" if @debug >= 2
+      block.call
+      puts "Post execution of block in Readline prompt" if @debug >= 2
+      break
+    end
+  end
+  
+  def evalreadline?(readlineprompt, &codeeval)
+    if readlineprompt == false
+      puts "Without Readline" if @debug >= 2
+      codeeval.call
+    else
+      puts "Pre evalreadline with readlineprompt" if @debug >= 2
+      evalreadline do
+        codeeval.call
+      end
+    end
+  end
+
+  def showmenu
+    unless @mymenutoggle == false
+      puts @menutitle
+      @menuitems.each {|n|
+        puts "#{@menuitemnumbercolor}#{n[0]})\e[0m\ #{n[1]}"        
+      }
+      puts "\n"
+    end
+  end
+  
+  def togglemenu
+    if @mymenutoggle == true
+      @mymenutoggle = false
+      puts "Toggle Menu: #{@mymenutoggle}" if @debug >= 1
+    else
+      @mymenutoggle = true
+      puts "Toggle Menu: #{@mymenutoggle}" if @debug >= 1
+    end
+  end
+  
   def menubuilder
     head = "buf ||= String.new; case buf; "
     y = 1
@@ -129,17 +133,17 @@ class MyMenu
       y += 1
     }
     tail = "end"
-    merge = "#{head}#{mc}#{tail}"
-    puts "Dynamic Merge: #{merge}".gsub(";", "\n") if @debug >= 3
+    menucode = "#{head}#{mc}#{tail}"
+    puts "Generated Code: #{menucode}".gsub(";", "\n") if @debug >= 3
     Kernel.send :define_method, :createmenu do |buf|
-      eval(merge)
+      eval(menucode)
     end
   end
   
 end
 
 x = MyMenu.new
-#x.debug = 3
+x.debug = 3
 x.settitle("Welcome to Trafviz")
 x.mymenuname = "Trafviz"
 x.prompt = "Trafviz"
@@ -147,10 +151,11 @@ x.prompt = "Trafviz"
 x.definemenuitem("listfilters") do
   puts "My List filters block"
 end
+# Define dummy method and create another instance of the class inside it.
 x.definemenuitem("setfilters") do
   # My Set filters block
   y = MyMenu.new
-  #y.debug = 3
+  y.debug = 3
   y.prompt = "Trafiz {Filters}>"
   y.definemenuitem("setfilter", true) do
     puts "Hello"
@@ -162,6 +167,7 @@ x.definemenuitem("setfilters") do
       puts "B: #{b}"
     end
   end
+  # Execute function you just created
   y.setfilter
 end
 # Define your list items
