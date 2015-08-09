@@ -11,7 +11,7 @@ require 'readline'
 
 class MyMenu
 
-  attr_writer :mymenuname, :mymenugreeting, :prompt, :promptcolor, :menutitlecolour, :mymenushow
+  attr_writer :mymenuname, :mymenugreeting, :prompt, :promptcolor, :menutitlecolour, :mymenushow, :debug
   attr_reader :menuitems
   
   def initialize
@@ -22,6 +22,7 @@ class MyMenu
     @menuitemnumbercolor = "\e[1;36m"
     @mymenugreeting = "Welcome to MyMenu"
     @mymenutoggle = true
+    @debug = 0
   end
 
   def settitle(title)
@@ -51,10 +52,10 @@ class MyMenu
   def togglemenu
     if @mymenutoggle == true
       @mymenutoggle = false
-      puts "Toggle Menu: #{@mymenutoggle}"
+      puts "Toggle Menu: #{@mymenutoggle}" if @debug >= 1
     else
       @mymenutoggle = true
-      puts "Toggle Menu: #{@mymenutoggle}"
+      puts "Toggle Menu: #{@mymenutoggle}" if @debug >= 1
     end
   end
   
@@ -77,20 +78,21 @@ class MyMenu
   
   def evalreadline(&block)
     while buf2 = Readline.readline("#{@promptcolor}#{@prompt}>\e[0m\ ", true)
-      puts "Here5"
+      puts "Eval Readline Pre execution" if @debug >= 2
       block.call
-      puts "Here6"
+      puts "Post execution of block in Readline prompt" if @debug >= 2
+      break
     end
   end
   
   def evalreadline?(readlineprompt, &codeeval)
     if readlineprompt == false
-      puts "Here3"
+      puts "Without Readline" if @debug >= 2
       codeeval.call
     else
-      puts "Here4"
+      puts "Pre evalreadline with readlineprompt" if @debug >= 2
       evalreadline do
-        codeeval
+        codeeval.call
       end
     end
   end
@@ -100,14 +102,14 @@ class MyMenu
     if args == nil
       Kernel.send :define_method, func_name do
         evalreadline?(readlineprompt) do
-          puts "Here"
+          puts "Without args" if @debug >= 2
           codeeval.call
         end
       end
     else
       Kernel.send :define_method, func_name do |args|
         evalreadline?(readlineprompt) do
-          puts "Here2"
+          puts "With args" if @debug >= 2
           codeeval.call
         end
       end    
@@ -128,7 +130,7 @@ class MyMenu
     }
     tail = "end"
     merge = "#{head}#{mc}#{tail}"
-    puts "Dynamic Merge: #{merge}".gsub(";", "\n")
+    puts "Dynamic Merge: #{merge}".gsub(";", "\n") if @debug >= 3
     Kernel.send :define_method, :createmenu do |buf|
       eval(merge)
     end
@@ -137,6 +139,7 @@ class MyMenu
 end
 
 x = MyMenu.new
+#x.debug = 3
 x.settitle("Welcome to Trafviz")
 x.mymenuname = "Trafviz"
 x.prompt = "Trafviz"
@@ -145,12 +148,19 @@ x.definemenuitem("listfilters") do
   puts "My List filters block"
 end
 x.definemenuitem("setfilters") do
-  #puts "My Set filters block"
+  # My Set filters block
   y = MyMenu.new
+  #y.debug = 3
   y.prompt = "Trafiz {Filters}>"
   y.definemenuitem("setfilter", true) do
     puts "Hello"
-    break
+    a = 2
+    if a == 1
+      puts "My Test"
+    else
+      b = 1
+      puts "B: #{b}"
+    end
   end
   y.setfilter
 end
