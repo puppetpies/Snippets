@@ -70,17 +70,16 @@ class A858
     @debug = 0
   end
 
-  def converthex(val)
-    str = val.hex
+  def self.define_component(name)
+    name_func = name.to_s.split("_")[1].to_sym
+    define_method(name) do |val|  
+      (val).send("#{name_func}")
+    end
   end
-  
-  def convertchr(val)
-    str = val.chr
-  end
-  
-  def convertord(val)
-    str = val.ord
-  end
+
+  define_component :convert_hex
+  define_component :convert_chr
+  define_component :convert_ord
   
   def baseshift(val, shift, func, type="chr")
     puts "Params: #{val} Shift: #{shift} Func: #{func} Type: #{type}" if @debug > 2
@@ -120,9 +119,9 @@ class A858
         if twochar.size == 2
           print " #{twochar}"
           @twochar_col << twochar
-          @dehex_col << converthex("#{twochar}")
-          @chr_col << convertchr(converthex("#{twochar}"))
-          @baseshift << baseshift(converthex("#{twochar}"), shift, func, type)
+          @dehex_col << convert_hex("#{twochar}")
+          @chr_col << convert_chr(convert_hex("#{twochar}"))
+          @baseshift << baseshift(convert_hex("#{twochar}"), shift, func, type)
           twochar = ""
         end
       }
