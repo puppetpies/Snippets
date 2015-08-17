@@ -7,6 +7,7 @@
  
 require 'pp'
 require 'getoptlong'
+require 'keycounter'
 
 ARGV[0] = "--help" if ARGV[0] == nil
 
@@ -112,6 +113,7 @@ class A858
     mdtuples = str.split(" ")
     twochar = String.new
     c = 0
+    k = Keycounter.new
     print "Twochar:"
     mdtuples.each {|n| # 32 Char strings of which last is 16
       n.split("").each {|m|
@@ -120,6 +122,7 @@ class A858
           print " #{twochar}"
           @twochar_col << twochar
           @dehex_col << convert_hex("#{twochar}")
+          k.keycount("A858_#{@dehex_col[@dehex_col.size - 1]}")
           @chr_col << convert_chr(convert_hex("#{twochar}"))
           @baseshift << baseshift(convert_hex("#{twochar}"), shift, func, type)
           twochar = ""
@@ -135,6 +138,9 @@ class A858
     puts "Dehex Char: #{@dehex_col}"
     puts "Chr: #{@chr_col}"
     puts "Baseshift Char: #{@baseshift}"
+    keys =  k.keycount_compile
+    puts "Keycounter info: "
+    pp keys.sort_by { |h| h[1] }
   end
 
 end
