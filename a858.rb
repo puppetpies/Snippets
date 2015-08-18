@@ -22,7 +22,8 @@ opts = GetoptLong.new(
   [ '--type', '-t', GetoptLong::OPTIONAL_ARGUMENT],
   [ '--reverse', '-r', GetoptLong::NO_ARGUMENT],
   [ '--removeletters', '-l', GetoptLong::NO_ARGUMENT],
-  [ '--brutedict', '-b', GetoptLong::NO_ARGUMENT]
+  [ '--brutedict', '-b', GetoptLong::NO_ARGUMENT],
+  [ '--reversemd5', '-m', GetoptLong::NO_ARGUMENT]
 )
 
 opts.each do |opt, arg|
@@ -55,6 +56,9 @@ opts.each do |opt, arg|
 
 -r, --reverse
     Reverse each 32 chr string
+
+-m, --reversemd5
+    Reverse MD5 string against dictionary
     
 -l, --removeletters
     Remove letters from 32 chr hex string
@@ -79,12 +83,14 @@ opts.each do |opt, arg|
       @removeletters = arg.to_s
     when '--brutedict'
       @brutedict = arg.to_s
+    when '--reversemd5'
+      @reversemd5 = arg.to_s
   end
 end
 
 class A858
 
-  attr_writer :reverse, :removeletters, :brutedict, :dictionary
+  attr_writer :reverse, :reversemd5, :removeletters, :brutedict, :dictionary
   
   def initialize
     @twochar_col = Array.new
@@ -92,6 +98,7 @@ class A858
     @chr_col = Array.new
     @baseshift = Array.new
     @reverse = false
+    @reversemd5 = false
     @removeletters = false
     @brutedict = false
     @dictionary = "wordsEn.txt"
@@ -105,6 +112,7 @@ class A858
   end
   
   def load_dict(str)
+    if @reversemd5 == true; str.reverse!; end
     File.open("#{@dictionary}", 'r') {|t|
       t.each_line {|l|
         if md5sum(l) == str
@@ -242,5 +250,10 @@ if defined?(@brutedict)
   x.brutedict = true
 else
   x.brutedict = false
+end
+if defined?(@reversemd5)
+  x.reversemd5 = true
+else
+  x.reversemd5 = false
 end
 x.decode(chooser, @wordsnum, @shift, @func)
