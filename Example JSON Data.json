@@ -1,0 +1,139 @@
+-- ########################################################################
+-- #
+-- # Author: Brian Hood
+-- # Email: <brianh6854@googlemail.com>
+-- # Description: 
+-- #
+-- # MonetDB - JSON type tests related to my THM
+
+-- sql>select json.length(json.filter(json_data, '$.store.book')) from test;
+-- +-------------------------+
+-- | length_filter_json_data |
+-- +=========================+
+-- |                       1 |
+-- |                       1 |
+-- +-------------------------+
+-- 2 tuples (5.555ms)
+
+-- # Select all data using [*] to get the real data counts per row or you get whats above
+--
+-- sql>select json.length(json.filter(json_data, '$.store.book.[*]')) from test;
+-- +-------------------------+
+-- | length_filter_json_data |
+-- +=========================+
+-- |                       2 |
+-- |                       3 |
+-- +-------------------------+
+-- 2 tuples (3.976ms)
+--
+-- # Real Total of books in the store for example
+-- sql>select sum(json.length(json.filter(json_data, '$.store.book.[*]'))) from test;
+-- +------+
+-- | L1   |
+-- +======+
+-- |    5 |
+-- +------+
+-- 1 tuple (6.606ms)
+-- sql>
+--
+-- # 2 Rows one with 2 books and the other with 3
+-- sql>select json.filter(json_data, '$..author,$..price') from test;
+-- +-----------------------------------------------------------+
+-- | filter_json_data                                          |
+-- +===========================================================+
+-- | ["Nigel Rees","Evelyn Waugh",8.95,12.99]                  |
+-- | ["Mark Pearson","Mark Pearson","S.L Grey",8.95,9.99,9.99] |
+-- +-----------------------------------------------------------+
+-- 2 tuples (3.442ms)
+
+-- Why is there only 2 books in the 2nd row [1] in the database
+-- sql>select json.filter(json_data, '$.store.book.[1].price') from test;
+-- +------------------+
+-- | filter_json_data |
+-- +==================+
+-- | [12.99]          |
+-- | [9.99]           |
+-- +------------------+
+-- 2 tuples (1.703ms)
+-- sql>
+
+-- Why does the third book feel like it exists in a third row in the database that doesn't exist
+-- sql>select json.filter(json_data, '$.store.book.[2].author') from test;
+-- +------------------+
+-- | filter_json_data |
+-- +==================+
+-- | []               |
+-- | ["S.L Grey"]     |
+-- +------------------+
+-- 2 tuples (2.961ms)
+-- sql>select json.filter(json_data, '$.store.book.[2].price') from test;
+-- +------------------+
+-- | filter_json_data |
+-- +==================+
+-- | []               |
+-- | [9.99]           |
+-- +------------------+
+-- 2 tuples (2.778ms)
+
+
+CREATE TABLE "threatmonitor"."test" (
+	"json_data" JSON
+);
+
+SET SCHEMA "threatmonitor";
+
+INSERT INTO test VALUES ('{ "store": {
+    "book": [
+      { "category": "reference",
+        "author": "Nigel Rees",
+        "title": "Sayings of the Century",
+        "price": 8.95
+      },
+      { "category": "fiction",
+        "author": "Evelyn Waugh",
+        "title": "Sword of Honour",
+        "price": 12.99
+      }
+    ]
+  }
+}');
+
+-- Added 2 more books since examples above for testing reasons
+
+INSERT INTO test VALUES ('{ "store": {
+    "book": [
+      { "category": "crime fiction",
+        "author": "Mark Pearson",
+        "title": "Murder City",
+        "price": 8.95,
+        "publisher": "Arrow Books"
+      },
+      { "category": "crime fiction",
+        "author": "Mark Pearson",
+        "title": "Killing Season",
+        "price": 9.99,
+        "publisher": "Arrow Books"
+      },
+      { "category": "horror",
+        "author": "S.L Grey",
+        "title": "The Ward",
+        "price": 9.99,
+        "publisher": "Arrow Books"
+      },
+      { "category": "horror",
+        "author": "S.L Grey",
+        "title": "The Mall",
+        "price": 9.99,
+        "publisher": "Arrow Books"
+      },
+      { "category": "crime fiction",
+        "author": "Mark Pearson",
+        "title": "Bloodwork",
+        "price": 9.99,
+        "publisher": "Arrow Books"
+      },
+    ]
+  }
+}');
+
+
