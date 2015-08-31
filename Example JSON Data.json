@@ -5,6 +5,32 @@
 -- # Description: 
 -- #
 -- # MonetDB - JSON type tests related to my THM
+-- #
+-- # Import all schema first
+
+-- Somethings i found that aren't implmented
+
+-- create function json.object(*) returns json external name json.objectrender;
+
+-- create function json.array(*) returns json external name json.arrayrender;
+
+-- unnesting the JSON structure
+
+-- create function json.unnest(js json)
+-- returns table( id integer, k string, v string) external name json.unnest;
+
+-- create function json.unnest(js json)
+-- returns table( k string, v string) external name json.unnest;
+
+-- create function json.unnest(js json)
+-- returns table( v string) external name json.unnest;
+
+-- create function json.nest table( id integer, k string, v string)
+-- returns json external name json.nest;
+
+create view books_total as select sum(json.length(json.filter(json_data, '$.store.book.[*]'))) as sum from test;
+
+create function json.book_filter(r string, tbl string) 
 
 -- sql>select json.length(json.filter(json_data, '$.store.book')) from test;
 -- +-------------------------+
@@ -58,6 +84,7 @@
 -- sql>
 
 -- Why does the third book feel like it exists in a third row in the database that doesn't exist
+-- Infact more like 4th due to the blank array element as the first row ?
 -- sql>select json.filter(json_data, '$.store.book.[2].author') from test;
 -- +------------------+
 -- | filter_json_data |
@@ -76,13 +103,56 @@
 -- 2 tuples (2.778ms)
 
 
+create view books as select id, recv_time, recv_date, json.filter(json_data, '$.store.book.[0].author') as author, 
+json.filter(json_data, '$.store.book.[0].price') as price, 
+json.filter(json_data, '$.store.book.[0].category') as category, 
+json.filter(json_data, '$.store.book.[0].title') as title, 
+json.filter(json_data, '$.store.book.[0].publisher') as publisher from test 
+UNION 
+select id, recv_time, recv_date, json.filter(json_data, '$.store.book.[1].author') as author, 
+json.filter(json_data, '$.store.book.[1].price') as price, 
+json.filter(json_data, '$.store.book.[1].category') as category, 
+json.filter(json_data, '$.store.book.[1].title') as title, 
+json.filter(json_data, '$.store.book.[1].publisher') as publisher from test
+UNION
+select id, recv_time, recv_date, json.filter(json_data, '$.store.book.[2].author') as author, 
+json.filter(json_data, '$.store.book.[2].price') as price, 
+json.filter(json_data, '$.store.book.[2].category') as category, 
+json.filter(json_data, '$.store.book.[2].title') as title, 
+json.filter(json_data, '$.store.book.[2].publisher') as publisher from test
+UNION
+select id, recv_time, recv_date, json.filter(json_data, '$.store.book.[3].author') as author, 
+json.filter(json_data, '$.store.book.[3].price') as price, 
+json.filter(json_data, '$.store.book.[3].category') as category, 
+json.filter(json_data, '$.store.book.[3].title') as title, 
+json.filter(json_data, '$.store.book.[3].publisher') as publisher from test
+UNION
+select id, recv_time, recv_date, json.filter(json_data, '$.store.book.[4].author') as author, 
+json.filter(json_data, '$.store.book.[4].price') as price, 
+json.filter(json_data, '$.store.book.[4].category') as category, 
+json.filter(json_data, '$.store.book.[4].title') as title, 
+json.filter(json_data, '$.store.book.[4].publisher') as publisher from test;
+
+SET SCHEMA "threatmonitor";
+
 CREATE TABLE "threatmonitor"."test" (
 	"json_data" JSON
 );
 
-SET SCHEMA "threatmonitor";
+DROP TABLE "threatmonitor".test;
+CREATE TABLE "threatmonitor".test (
+id INT GENERATED ALWAYS AS 
+        IDENTITY (
+           START WITH 0 INCREMENT BY 1
+           NO MINVALUE NO MAXVALUE
+           CACHE 2 CYCLE
+) primary key,
+  recv_date date,
+  recv_time time,
+  json_data JSON
+);
 
-INSERT INTO test VALUES ('{ "store": {
+INSERT INTO test (recv_date,recv_time,json_data) VALUES (NOW(), NOW(), '{ "store": {
     "book": [
       { "category": "reference",
         "author": "Nigel Rees",
@@ -99,8 +169,24 @@ INSERT INTO test VALUES ('{ "store": {
 }');
 
 -- Added 2 more books since examples above for testing reasons
+-- It seems that elements 2,3,4 are The Ward, The Mall, Bloodwork unsure why ?
 
-INSERT INTO test VALUES ('{ "store": {
+-- sql>select json.filter(json_data, '$.store.book.[4]') from test;
+-- +--------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+-- | filter_json_data                                                                                                                                                   |
+-- +====================================================================================================================================================================+
+-- | []                                                                                                                                                                 |
+-- | [{ "category": "crime fiction",                                                                                                                                    |
+-- :         "author": "Mark Pearson",                                                                                                                                  :
+-- :         "title": "Bloodwork",                                                                                                                                      :
+-- :         "price": 9.99,                                                                                                                                            :
+-- :         "publisher": "Arrow Books"                                                                                                                                 :
+-- :       }]                                                                                                                                                           :
+-- +--------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+-- 2 tuples (1.872ms)
+-- sql>
+
+INSERT INTO test (recv_date,recv_time,json_data) VALUES (NOW(), NOW(), '{ "store": {
     "book": [
       { "category": "crime fiction",
         "author": "Mark Pearson",
