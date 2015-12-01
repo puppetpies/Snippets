@@ -398,3 +398,51 @@ CREATE TABLE "threatmonitor"."wifi_tcppacket4" (
 	CONSTRAINT "tcppacket_4_guid_pkey" PRIMARY KEY ("guid")
 );
 
+-- Threatmonmitor Suite machine
+
+CREATE REMOTE TABLE "threatmonitor".geoipdata_ipv4blocks_city (
+  network varchar(18) NOT NULL,
+  geoname_id char(10) NOT NULL,
+  registered_country_geoname_id char(30) NOT NULL,
+  represented_country_geoname_id char(30) NOT NULL,
+  is_anonymous_proxy char(30) NOT NULL,
+  is_satellite_provider char(30) NOT NULL,
+  postal_code char(30) NOT NULL,
+  latitude char(10) NOT NULL,
+  longitude char(10) NOT NULL
+) ON 'mapi:monetdb://172.17.0.6:50000/threatmonitor';
+
+CREATE REMOTE TABLE "threatmonitor".geoipdata_locations_city (
+  geoname_id char(10) NOT NULL,
+  locale_code char(2) NOT NULL,
+  continent_code char(2) NOT NULL,
+  continent_name char(15) NOT NULL,
+  country_iso_code char(2) NOT NULL,
+  country_name char(50) NOT NULL,
+  subdivision_1_iso_code char(70) NOT NULL,
+  subdivision_1_name char(50) NOT NULL,
+  subdivision_2_iso_code char(70) NOT NULL,
+  subdivision_2_name char(50) NOT NULL,
+  city_name char(70) NOT NULL,
+  metro_code char(30) NOT NULL,
+  time_zone char(30) NOT NULL
+) ON 'mapi:monetdb://172.17.0.6:50000/threatmonitor';
+
+CREATE REMOTE TABLE "threatmonitor".geoipdata_ipv4blocks_country (
+  network varchar(18) NOT NULL,
+  geoname_id char(10) NOT NULL,
+  registered_country_geoname_id char(30) NOT NULL,
+  represented_country_geoname_id char(30) NOT NULL,
+  is_anonymous_proxy char(30) NOT NULL,
+  is_satellite_provider char(30) NOT NULL
+) ON 'mapi:monetdb://172.17.0.6:50000/threatmonitor';
+
+CREATE REMOTE TABLE "threatmonitor".geoipdata_locations_country (
+  geoname_id char(10) NOT NULL,
+  locale_code char(2) NOT NULL,
+  continent_code char(2) NOT NULL,
+  continent_name char(15) NOT NULL,
+  country_iso_code char(2) NOT NULL,
+  country_name char(50) NOT NULL
+) ON 'mapi:monetdb://172.17.0.6:50000/threatmonitor';
+
