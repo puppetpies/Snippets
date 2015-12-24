@@ -23,7 +23,6 @@ CREATE INDEX "index_ip_src_wifiip" ON "threatmonitor"."wifi_ippacket" ("ip_src")
 
 ---
 
-
 DROP INDEX "index_guid_wifiip";
 DROP INDEX "index_ip_dst_wifiip";
 DROP INDEX "index_ip_src_wifiip";
