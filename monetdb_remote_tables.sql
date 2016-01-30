@@ -21,7 +21,7 @@ CREATE REMOTE TABLE wifi_ippacket (
 	"ip_ttl"    INTEGER       NOT NULL,
 	"ip_ver"    INTEGER       NOT NULL
 --	CONSTRAINT "ippacket_1_guid_pkey" PRIMARY KEY ("guid")
-) ON 'mapi:monetdb://172.17.0.2:50000/threatmonitor';
+) ON 'mapi:monetdb://172.17.0.3:50000/threatmonitor';
 
 DROP TABLE wifi_ippacket2;
 CREATE REMOTE TABLE wifi_ippacket2 (
@@ -41,7 +41,7 @@ CREATE REMOTE TABLE wifi_ippacket2 (
 	"ip_ttl"    INTEGER       NOT NULL,
 	"ip_ver"    INTEGER       NOT NULL
 --	CONSTRAINT "ippacket_2_guid_pkey" PRIMARY KEY ("guid")
-) ON 'mapi:monetdb://172.17.0.3:50000/threatmonitor';
+) ON 'mapi:monetdb://172.17.0.4:50000/threatmonitor';
 
 DROP TABLE wifi_ippacket3;
 CREATE REMOTE TABLE wifi_ippacket3 (
@@ -61,7 +61,7 @@ CREATE REMOTE TABLE wifi_ippacket3 (
 	"ip_ttl"    INTEGER       NOT NULL,
 	"ip_ver"    INTEGER       NOT NULL
 --	CONSTRAINT "ippacket_3_guid_pkey" PRIMARY KEY ("guid")
-) ON 'mapi:monetdb://172.17.0.4:50000/threatmonitor';
+) ON 'mapi:monetdb://172.17.0.5:50000/threatmonitor';
 
 DROP TABLE wifi_ippacket4;
 CREATE REMOTE TABLE wifi_ippacket4 (
@@ -81,7 +81,7 @@ CREATE REMOTE TABLE wifi_ippacket4 (
 	"ip_ttl"    INTEGER       NOT NULL,
 	"ip_ver"    INTEGER       NOT NULL
 --	CONSTRAINT "ippacket_4_guid_pkey" PRIMARY KEY ("guid")
-) ON 'mapi:monetdb://172.17.0.5:50000/threatmonitor';
+) ON 'mapi:monetdb://172.17.0.6:50000/threatmonitor';
 
 
 CREATE MERGE TABLE ippacket (
@@ -128,7 +128,7 @@ CREATE REMOTE TABLE "threatmonitor"."wifi_tcppacket" (
 	"tcp_urp"      CHAR(10),
 	"tcp_win"      INTEGER
 --	CONSTRAINT "tcppacket_1_guid_pkey" PRIMARY KEY ("guid")
-) ON 'mapi:monetdb://172.17.0.2:50000/threatmonitor';
+) ON 'mapi:monetdb://172.17.0.3:50000/threatmonitor';
 
 DROP TABLE wifi_tcppacket2;
 CREATE REMOTE TABLE "threatmonitor"."wifi_tcppacket2" (
@@ -150,7 +150,7 @@ CREATE REMOTE TABLE "threatmonitor"."wifi_tcppacket2" (
 	"tcp_urp"      CHAR(10),
 	"tcp_win"      INTEGER
 --	CONSTRAINT "tcppacket_2_guid_pkey" PRIMARY KEY ("guid")
-) ON 'mapi:monetdb://172.17.0.3:50000/threatmonitor';
+) ON 'mapi:monetdb://172.17.0.4:50000/threatmonitor';
 
 DROP TABLE wifi_tcppacket3;
 CREATE REMOTE TABLE "threatmonitor"."wifi_tcppacket3" (
@@ -172,7 +172,7 @@ CREATE REMOTE TABLE "threatmonitor"."wifi_tcppacket3" (
 	"tcp_urp"      CHAR(10),
 	"tcp_win"      INTEGER
 --	CONSTRAINT "tcppacket_3_guid_pkey" PRIMARY KEY ("guid")
-) ON 'mapi:monetdb://172.17.0.4:50000/threatmonitor';
+) ON 'mapi:monetdb://172.17.0.5:50000/threatmonitor';
 
 DROP TABLE wifi_tcppacket4;
 CREATE REMOTE TABLE "threatmonitor"."wifi_tcppacket4" (
@@ -194,7 +194,7 @@ CREATE REMOTE TABLE "threatmonitor"."wifi_tcppacket4" (
 	"tcp_urp"      CHAR(10),
 	"tcp_win"      INTEGER
 --	CONSTRAINT "tcppacket_4_guid_pkey" PRIMARY KEY ("guid")
-) ON 'mapi:monetdb://172.17.0.5:50000/threatmonitor';
+) ON 'mapi:monetdb://172.17.0.6:50000/threatmonitor';
 
 CREATE MERGE TABLE "threatmonitor"."tcppacket" (
 	"guid"         CHAR(36)      NOT NULL,
@@ -410,7 +410,7 @@ CREATE REMOTE TABLE "threatmonitor".geoipdata_ipv4blocks_city (
   postal_code char(30) NOT NULL,
   latitude char(10) NOT NULL,
   longitude char(10) NOT NULL
-) ON 'mapi:monetdb://172.17.0.6:50000/threatmonitor';
+) ON 'mapi:monetdb://172.17.0.7:50000/threatmonitor';
 
 CREATE REMOTE TABLE "threatmonitor".geoipdata_locations_city (
   geoname_id char(10) NOT NULL,
@@ -426,7 +426,7 @@ CREATE REMOTE TABLE "threatmonitor".geoipdata_locations_city (
   city_name char(70) NOT NULL,
   metro_code char(30) NOT NULL,
   time_zone char(30) NOT NULL
-) ON 'mapi:monetdb://172.17.0.6:50000/threatmonitor';
+) ON 'mapi:monetdb://172.17.0.7:50000/threatmonitor';
 
 CREATE REMOTE TABLE "threatmonitor".geoipdata_ipv4blocks_country (
   network varchar(18) NOT NULL,
@@ -435,7 +435,7 @@ CREATE REMOTE TABLE "threatmonitor".geoipdata_ipv4blocks_country (
   represented_country_geoname_id char(30) NOT NULL,
   is_anonymous_proxy char(30) NOT NULL,
   is_satellite_provider char(30) NOT NULL
-) ON 'mapi:monetdb://172.17.0.6:50000/threatmonitor';
+) ON 'mapi:monetdb://172.17.0.7:50000/threatmonitor';
 
 CREATE REMOTE TABLE "threatmonitor".geoipdata_locations_country (
   geoname_id char(10) NOT NULL,
@@ -444,5 +444,5 @@ CREATE REMOTE TABLE "threatmonitor".geoipdata_locations_country (
   continent_name char(15) NOT NULL,
   country_iso_code char(2) NOT NULL,
   country_name char(50) NOT NULL
-) ON 'mapi:monetdb://172.17.0.6:50000/threatmonitor';
+) ON 'mapi:monetdb://172.17.0.7:50000/threatmonitor';
 
