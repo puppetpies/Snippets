@@ -1,0 +1,3 @@
+CREATE REPLICA TABLE test2 AS (SELECT * FROM test) WITH DATA;
+
+CREATE TABLE test2 AS (select * from test) WITH DATA;
