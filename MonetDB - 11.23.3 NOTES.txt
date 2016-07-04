@@ -1,0 +1,14 @@
+MonetDB 11.23.3 Upgrade notes for REMOTE / MERGE TABLES
+
+defaults to 127.0.0.1 / localhost
+
+monetdbd set listenaddr=192.168.1.1 /var/monetdb5/dbfarm
+monetdbd get all /var/monetdb5/dbfarm
+
+monetdbd stop /var/monetdb/dbfarm
+
+# monetdb stop/start dbname # doesn't make the change take effect
+
+monetdbd start /var/monetdb/dbfarm
+
+
