@@ -23,3 +23,19 @@ p a[3]["green"]
 
 p a
 p a.class
+
+res = a
+0.upto(a.size - 1) {|n|
+  p res[n]
+}
+
+a = Hash(Int32, Hash(String, String)).new; 
+a.merge!({0 => {"test" => "test"}}); 
+a.merge!({1 => {"test" => "test"}}); 
+p a.inspect; 
+a.each do |n,x| 
+  puts "Record: #{n}"; 
+  x.each do |y,z| 
+    puts "K: #{y} V: #{z}" 
+  end 
+end
