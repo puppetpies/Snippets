@@ -29,7 +29,10 @@ res = a
   p res[n]
 }
 
-a = Hash(Int32, Hash(String, String)).new; 
+# You write this as below
+#a = Hash(Int32, Hash(String, String)).new; 
+# Or this using of !
+a = {} of Int32 => Hash(String, String)
 a.merge!({0 => {"test" => "test"}}); 
 a.merge!({1 => {"test" => "test"}}); 
 p a.inspect; 
