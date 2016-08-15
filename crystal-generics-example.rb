@@ -1,3 +1,14 @@
+########################################################################
+#
+# Author: Brian Hood
+# Name: Crystal Generics examples
+# Codename:
+# Description: 
+#   StaticArray / Syntax & Semantics notes and a bug
+#
+#
+########################################################################
+
 class MyBox(T, T2, T3)
 
   property? value : Float64 = 0.1
@@ -23,16 +34,31 @@ class MyBox(T, T2, T3)
   
 end
 
+# crystal eval 'class Args(*T); @args : T; def initialize(*@args : *T); end; end'
 
-# Breaks compiler due to invaid type for T #3157
+# Breaks compiler due to invalid type for T #3157
 #
-# class MyBox3(T); property? value : Array(String); def initialize(@value : T); end; end; a = MyBox3(3).new(["test"]);
+# crystal eval 'class MyBox3(T); property? value : Array(String); def initialize(@value : T); end ;end'
 
-i = Array(Int32).new
-i << 3
-i << 4
-string_box = MyBox(Float64, Array(Int32), String).new(0.4, i, "am floating")
-p string_box.value
-string_box.value2
-p string_box.value3
+class MyBox3(T)
+  property? value : Array(String)
+  def initialize(@value : T); end
+end
+
+a = MyBox3(2).new("test")
+
+#class MyBox4(T)
+#  property? value2 : Array(Int32) | String
+#  def initialize(@value : T); end
+#end
+
+#a = MyBox3(3).new(["test"]);
+
+#i = Array(Int32).new
+#i << 3
+#i << 4
+#string_box = MyBox(Float64, Array(Int32), String).new(0.4, i, "am floating")
+#p string_box.value
+#string_box.value2
+#p string_box.value3
 
