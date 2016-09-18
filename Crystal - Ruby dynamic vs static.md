@@ -1,4 +1,4 @@
-# Crystal - Ruby dyamic vs static
+# Crystal - Ruby Dynamic vs Static
 
 The main difference between Ruby and Crystal is Ruby is a dynamic interpeted language and
 Crystal is a compiled and statically typed language, oh and everythings an object.
