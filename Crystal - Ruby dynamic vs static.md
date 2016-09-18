@@ -179,8 +179,9 @@ Some Crystal code is compatable with Ruby and vice versa mainly simple programs
 
 Crystal can talk to C libraries and you don't have the annoyance of creating Gems with external bindings and header files.
 
-# This is all you would need to make MonetDB work in a very basic form after installing the client libaries of which
-# are required for the dynamic linking / compilation.
+# This is all you would need to make MonetDB work in a very basic form after installing the client libraries 
+
+## These are required for the dynamic linking / compilation.
 
 ```crystal
 @[Link("mapi")]
