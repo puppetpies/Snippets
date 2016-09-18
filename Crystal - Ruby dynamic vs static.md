@@ -74,7 +74,7 @@ Len or Scale: scale
 Everything else: We are digits
 ```
 
-You can also patch existing namespaces / classes that exist but you can t add new defs/functions
+You can also patch existing namespaces / classes that exist but you can't add new defs/functions
 after runtime so you could do.
 
 ```crystal
@@ -179,11 +179,15 @@ Some Crystal code is compatable with Ruby and vice versa mainly simple programs
 
 Crystal can talk to C libraries and you don't have the annoyance of creating Gems with external bindings and header files.
 
-# This is all you would need to make MonetDB work in a very basic form after installing the client libaries.
+# This is all you would need to make MonetDB work in a very basic form after installing the client libaries of which
+# are required for the dynamic linking / compilation.
 
 ```crystal
 @[Link("mapi")]
 lib MonetDBMAPI
+  type Mapi = Void*
+  type Mapihdl = Void*
+  alias Mapimsg = LibC::Int
   fun mapi_connect(host : LibC::Char*, port : LibC::Int, username : LibC::Char*, password : LibC::Char*, lang : LibC::Char*, dbname : LibC::Char*) : Mapi
   fun mapi_query(mid : Mapi, cmd : LibC::Char*) : Mapihdl
   fun mapi_disconnect(mid : Mapi) : Mapimsg
@@ -215,6 +219,15 @@ class MonetDB
     MonetDBMAPI.mapi_disconnect(@mid)
   end
 end
+m = MonetDB.new
+m.host = "localhost"
+m.username = "monetdb"
+m.password = "monetdb"
+m.db = "test";
+m.connect
+p m
+m.query("SELECT 1;")
+m.disconnect
 ```
 
 ## Conclusion.
