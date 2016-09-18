@@ -137,9 +137,9 @@ Overloads are:
 
   watch(Bool)
   ^~~~~
-
+```
 the above didn't work because it accepts
-
+```crystal
  - watch(str : String, message : String, switch : Bool)
  - watch(str : String)
 
