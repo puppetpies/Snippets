@@ -161,7 +161,7 @@ So the use cases for the Crystal language is quite simple if you don't need dyna
 created on the fly or want to eval lots of code or inject code in places you could just as easily
 make it in Crystal it depends on your use case.
 
-Crystal has,
+## Crystal has,
 
 Monkeypatching so you can patch existing methods
 
