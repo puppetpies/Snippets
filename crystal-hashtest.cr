@@ -30,7 +30,7 @@ res = a
 }
 
 # You write this as below
-#a = Hash(Int32, Hash(String, String)).new; 
+#a = Hash(Int32, Hash(String, String)).new;
 # Or this using of !
 a = {} of Int32 => Hash(String, String)
 a.merge!({0 => {"test" => "test"}}); 
