@@ -229,3 +229,11 @@ Crystal has only been around 3 years and has MySQL / Postgres and Message queue 
 
 You get the benefits of C performance but code it like a high level language i can't think of anywhere thats been done before.
 
+## Links
+http://carc.in - Try you Ruby code in Crystal on your web browser
+http://crystal-lang.org
+Follow me on Twitter / Github - http://twitter.com/puppetpies
+
+Bye for now !
+
+Brian Hood
