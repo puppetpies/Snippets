@@ -231,8 +231,10 @@ You get the benefits of C performance but code it like a high level language i c
 
 ## Links
 http://carc.in - Try you Ruby code in Crystal on your web browser
+
 http://crystal-lang.org
-Follow me on Twitter / Github - http://twitter.com/puppetpies
+
+Follow me on Twitter / Github - http://twitter.com/puppetpies,  http://github.com/puppetpies
 
 Bye for now !
 
