@@ -162,13 +162,21 @@ created on the fly or want to eval lots of code or inject code in places you cou
 make it in Crystal it depends on your use case.
 
 Crystal has,
+
 Monkeypatching so you can patch existing methods
+
 Macros so you can create a little bit what looks like dynamic code but is built before compilation.
+
 We also have &block / yield
+
 Crystal has Shards there like Gems but we prefer to use github.
+
 Crystal is designed to be a modern C like language but with Ruby inspired syntax.
+
 Crystal is compiled under LLVM so its very fast and the binaries are very small because of dynamic linking.
+
 Some Crystal code is compatable with Ruby and vice versa mainly simple programs
+
 Crystal can talk to C libraries and you don't have the annoyance of creating Gems with external bindings and header files.
 
 # This is all you would need to make MonetDB work in a very basic form after installing the client libaries.
