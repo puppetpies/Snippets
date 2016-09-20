@@ -1,0 +1,14 @@
+chown -R postgres:postgres /var/lib/postgresql
+gosu postgres pg_ctl -D /var/lib/postgresql/data -l /var/lib/postgresql/logfile initdb
+gosu postgres pg_ctl -D /var/lib/postgresql/data -l /var/lib/postgresql/logfile start
+
+gosu postgres pg_ctl stop
+cd /var/lib/postgresql/data/
+cat >> pg_hba.conf
+# Add this for docker containers
+host	all		all		172.17.0.1/24		trust
+
+cd /
+gosu postgres pg_ctl -D /var/lib/postgresql/data -l /var/lib/postgresql/logfile start
+gosu postgres createuser -d -a -P root
+createdb wire
