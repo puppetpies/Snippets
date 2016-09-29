@@ -1,0 +1,20 @@
+[brian@orville ~]$ crystal eval 't = {Hash(Int32, String).new, Hash(String, String).new}; t[0].merge!({0 => "test"}); t = {0, Hash(String, String).new}'
+Bug: trying to downcast Tuple(Hash(Int32, String), Hash(String, String)) <- Tuple(Hash(Int32, String) | Int32, Hash(String, String))
+[5496126] ???
+[15551783] ???
+[15752083] ???
+[15628598] ???
+[15792921] ???
+[15777391] ???
+[15629919] ???
+[15792921] ???
+[15777391] ???
+[15629919] ???
+[15447469] ???
+[6877456] ???
+[5745015] ???
+[5593768] main +17736
+[140475604631616] __libc_start_main +240
+[5485329] ???
+
+Error: you've found a bug in the Crystal compiler. Please open an issue, including source code that will allow us to reproduce the bug: https://github.com/crystal-lang/crystal/issues
