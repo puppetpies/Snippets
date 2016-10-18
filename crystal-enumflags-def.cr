@@ -1,12 +1,24 @@
+########################################################################
+#
+# Author: Brian Hood
+# Name: Crystal Enum Example
+# Codename:
+# Description: 
+#   Enum Examples
+#
+########################################################################
 
 enum Flags
- Y = 1
- N = 2
+ Y = 0
+ N = 1
 end
-p Flags::N.value
 
-def test(a : Flags)
+def enum1(a : Flags)
   puts a.value
 end
 
-test(Flags::Y)
+y = Flags.new(0)
+n = Flags.new(1)
+
+enum1(y)
+enum1(n)
